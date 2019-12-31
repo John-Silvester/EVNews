@@ -8,7 +8,7 @@ app = Flask(__name__)
 
 # set number of articles (snoa)
 snoa = 20
-temp_file = "/home/john/PycharmProjects/EVNews/temp_articles.csv"
+temp_file = "temp_articles.csv"
 
 
 def retrieve_posts(source_file):
@@ -36,7 +36,7 @@ def home():
 def electrek():
     global snoa
     # source_file = url_for('EVNews', filename='electrek_articles.csv')
-    source_file = "/home/john/PycharmProjects/EVNews/electrek_articles.csv"
+    source_file = "electrek_articles.csv"
     if request.method == 'POST':
         snoa = int(request.form['page_num'])
     posts = retrieve_posts(source_file)
@@ -49,7 +49,7 @@ def electrek():
 @app.route("/insideevs", methods=['GET', 'POST'])
 def insideevs():
     global snoa
-    source_file = "/home/john/PycharmProjects/EVNews/insideevs_articles.csv"
+    source_file = "insideevs_articles.csv"
     if request.method == 'POST':
         snoa = int(request.form['page_num'])
     posts = retrieve_posts(source_file)
@@ -62,7 +62,7 @@ def insideevs():
 @app.route("/teslarati", methods=['GET', 'POST'])
 def teslarati():
     global snoa
-    source_file = "/home/john/PycharmProjects/EVNews/teslarati_articles.csv"
+    source_file = "teslarati_articles.csv"
     if request.method == 'POST':
         snoa = int(request.form['page_num'])
     posts = retrieve_posts(source_file)
@@ -75,7 +75,7 @@ def teslarati():
 @app.route("/greencarguide", methods=['GET', 'POST'])
 def greencarguide():
     global snoa
-    source_file = "/home/john/PycharmProjects/EVNews/greencarguide_articles.csv"
+    source_file = "greencarguide_articles.csv"
     if request.method == 'POST':
         snoa = int(request.form['page_num'])
     posts = retrieve_posts(source_file)
@@ -88,7 +88,7 @@ def greencarguide():
 @app.route("/cleantechnica", methods=['GET', 'POST'])
 def cleantechnica():
     global snoa
-    source_file = "/home/john/PycharmProjects/EVNews/cleantechnica_articles.csv"
+    source_file = "cleantechnica_articles.csv"
     if request.method == 'POST':
         snoa = int(request.form['page_num'])
     posts = retrieve_posts(source_file)
@@ -101,7 +101,7 @@ def cleantechnica():
 @app.route("/greencarreports", methods=['GET', 'POST'])
 def greencarreports():
     global snoa
-    source_file = "/home/john/PycharmProjects/EVNews/greencarreports_articles.csv"
+    source_file = "greencarreports_articles.csv"
     if request.method == 'POST':
         snoa = int(request.form['page_num'])
     posts = retrieve_posts(source_file)
@@ -114,7 +114,7 @@ def greencarreports():
 @app.route("/chargedevs", methods=['GET', 'POST'])
 def chargedevs():
     global snoa
-    source_file = "/home/john/PycharmProjects/EVNews/chargedevs_articles.csv"
+    source_file = "chargedevs_articles.csv"
     if request.method == 'POST':
         snoa = int(request.form['page_num'])
     posts = retrieve_posts(source_file)
@@ -127,7 +127,7 @@ def chargedevs():
 @app.route("/electrive", methods=['GET', 'POST'])
 def electrive():
     global snoa
-    source_file = "/home/john/PycharmProjects/EVNews/electrive_articles.csv"
+    source_file = "electrive_articles.csv"
     if request.method == 'POST':
         snoa = int(request.form['page_num'])
     posts = retrieve_posts(source_file)
@@ -139,7 +139,7 @@ def electrive():
 
 @app.route("/updatearticles")
 def updatearticles():
-    subprocess.call([sys.executable, '/home/john/PycharmProjects/EVNews/update_articles.py'])
+    subprocess.call([sys.executable, 'update_articles.py'])
     return render_template("EV_home.html", title="Home")
 
 
@@ -149,8 +149,8 @@ def search():
     if request.method == 'POST':
         # page_num = int(request.form['page_num'])
         source_search = request.form['outlet']
-        source_file = "/home/john/PycharmProjects/EVNews" + source_search + "_articles.csv"
-        source_search = source_search.replace("/", "")
+        source_file = source_search + "_articles.csv"
+        source_file = source_file.replace("/", "")
         # Use pandas to access data from CSV
         df1 = pd.read_csv(source_file, encoding='utf-8')
         search_text = request.form['search']
