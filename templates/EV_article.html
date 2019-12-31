@@ -1,0 +1,51 @@
+{% extends "EV_layout.html" %}
+{% block content %}
+
+    <form name="number_of_articles" action="{{ outlet_page }}" method="post">
+        <label>Number of articles per page: </label>
+        <input type="number" name="page_num" min="5" max="80" value="15">
+        <input type="submit" value="submit">
+    </form>
+    <br>
+
+    <form name="search_text" action="/search" method="post">
+        <label>Text Search: </label>
+        <input type="text" name="search">
+        <input type="hidden" name="outlet" value="{{ outlet_page }}">
+        <input type="submit" value="Search">
+    </form>
+
+    {% for post in posts %}
+
+        <article>
+            <h2><a href="{{ post.article_link }}">{{ post.title }}</a></h2>
+
+            <figure>
+                <img src="{{ post.image }}"
+                     alt="{{ post.alt }}">
+                     
+
+
+                <figcaption> {{ post.title }}.</figcaption>
+            </figure>
+
+
+
+            <footer id='footer'>
+                <ul>
+                    <li class="source">{{ post.outlet }}</li>
+                    <li class="date">{{ post.date }}</li>
+                    <li class="By Line">{{ post.byline }}</li>
+
+                </ul>
+
+            </footer>
+
+            <br>
+            <p>{{ post.short_description }}</p>
+        </article>
+
+        <a href="#header">go to the top</a>
+
+    {% endfor %}
+{% endblock content %}

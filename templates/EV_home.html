@@ -1,0 +1,65 @@
+{% extends "EV_layout.html" %}
+    {% block content %}
+
+        <br>
+        <form action="/updatearticles">
+            <button type="submit">Reset Articles</button><br>
+        </form>
+        <br>
+        <div class="homePageLink">
+            <a href="/home">
+            <img src="{{ url_for('static', filename='home-yellow-glass-chrome.jpg') }}"
+                 style="width:60px; height:60px" title="home" alt="home"></a>
+        </div>
+        <br>
+        <div class="PageLink">
+            <a href="/electrek">
+            <img src="{{ url_for('static', filename='banner_Electrek.jpg') }}"
+                 style="width:300px" title="electrek" alt="electrek link"></a>
+        </div>
+
+        <div class="PageLink">
+            <a href="/insideevs">
+            <img src="{{ url_for('static', filename='banner_insideEVs.jpg') }}"
+                 style="width:300px" title="insideEVs" alt="insideEVs link"></a>
+        </div>
+
+        <div class="PageLink">
+            <a href="/teslarati">
+            <img src="{{ url_for('static', filename='banner_TESLArati.jpg') }}"
+                 style="width:300px" title="TESLArati" alt="TESLArati"></a>
+        </div>
+
+        <div class="PageLink">
+            <a href="/cleantechnica">
+            <img src="{{ url_for('static', filename='banner_cleantechnica.jpg') }}"
+                 style="width:300px" title="CleanTechnica" alt="CleanTechnica"></a><br>
+        </div>
+
+        <div class="PageLink">
+            <a href="/greencarguide">
+            <img src="{{ url_for('static', filename='banner_greencarguide.jpg') }}"
+                 style="width:300px" title="Green Car Guide" alt="Green Car Guide"></a><br>
+        </div>
+
+
+        <div class="PageLink">
+            <a href="/electrive">
+            <img src="{{ url_for('static', filename='banner_electrive.jpg') }}"
+                 style="width:300px" title="electrive" alt="electrive"></a><br>
+        </div>
+
+        <div class="PageLink">
+            <a href="/greencarreports">
+            <img src="{{ url_for('static', filename='banner_greencarreports.jpg') }}"
+                 style="width:300px" title="Green Car Reports" alt="Green Car Reports"></a><br>
+        </div>
+
+        <div class="PageLink">
+            <a href="/chargedevs">
+            <img src="{{ url_for('static', filename='banner_chargedevs.jpg') }}"
+                 style="width:300px" title="Charged EVs" alt="Charged EVs"></a><br>
+        </div>
+
+
+    {% endblock content %}

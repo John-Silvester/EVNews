@@ -1,0 +1,12 @@
+
+
+{{ date }}
+{{ title }}
+{{ short_description }}
+{{ article_link  }}
+{{ article_image  }}
+{{ byline  }}
+{{ tag_text  }}
+{{ tag_title  }}
+{{ tag_link  }}
+{{ outlet_page }}

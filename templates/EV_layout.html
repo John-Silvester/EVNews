@@ -1,0 +1,99 @@
+<!doctype html>
+<html class="no-js" lang="">
+    <head>
+         {% if title %}
+                <title>EV News - {{ title }}</title>
+         {% else %}
+                <title>EV News</title>
+         {% endif %}
+        <meta charset="utf-8">
+
+        <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='main.css') }}">
+    </head>
+    <body>
+        <div id="wraper" >
+            <header id="header">
+                {% if title %}
+                    <h1 class='page_title'>EV News - {{ title }}</h1>
+                {% else %}
+                    <h1 class='page_title'>EV News</h1>
+                {% endif %}
+                
+            </header>
+            <nav id="nav" >
+
+                <div class="navPageLink">
+                    <a href="/home">
+                    <img src="{{ url_for('static', filename='home-yellow-glass-chrome.jpg') }}"
+                         style="width:60px; height:60px" title="home" alt="home"></a><br>
+                </div>
+
+                <div class="navPageLink">
+                    <a href="/electrek">
+                    <img src="{{ url_for('static', filename='banner_Electrek.jpg') }}"
+                         style="width:150px" title="electrek" alt="electrek link"></a><br>
+                </div>
+
+                <div class="navPageLink">
+                    <a href="/insideevs">
+                    <img src="{{ url_for('static', filename='banner_insideEVs.jpg') }}"
+                         style="width:150px" title="insideEVs" alt="insideEVs link"></a><br>
+                </div>
+
+                <div class="navPageLink">
+                    <a href="/teslarati">
+                    <img src="{{ url_for('static', filename='banner_TESLArati.jpg') }}"
+                         style="width:150px" title="TESLArati" alt="TESLArati"></a><br>
+                </div>
+
+                <div class="navPageLink">
+                    <a href="/cleantechnica">
+                    <img src="{{ url_for('static', filename='banner_cleantechnica.jpg') }}"
+                         style="width:150px" title="CleanTechnica" alt="CleanTechnica"></a><br>
+                </div>
+
+                <div class="navPageLink">
+                    <a href="/greencarguide">
+                    <img src="{{ url_for('static', filename='banner_greencarguide.jpg') }}"
+                         style="width:150px" title="Green Car Guide" alt="Green Car Guide"></a><br>
+                </div>
+
+
+                <div class="navPageLink">
+                    <a href="/electrive">
+                    <img src="{{ url_for('static', filename='banner_electrive.jpg') }}"
+                         style="width:150px" title="electrive" alt="electrive"></a><br>
+                </div>
+
+
+                <div class="navPageLink">
+                    <a href="/greencarreports">
+                    <img src="{{ url_for('static', filename='banner_greencarreports.jpg') }}"
+                         style="width:150px" title="Green Car Reports" alt="Green Car Reports"></a><br>
+                </div>
+
+                <div class="navPageLink">
+                    <a href="/chargedevs">
+                    <img src="{{ url_for('static', filename='banner_chargedevs.jpg') }}"
+                         style="width:150px" title="Charged EVs" alt="Charged EVs"></a><br>
+                </div>
+
+            </nav>
+
+            <main id="main" >
+
+
+
+
+                {% block content %}{% endblock %}
+                
+            </main>
+
+            <aside id="aside" >
+
+            </aside>
+
+            
+        </div>
+    </body>
+</html>
