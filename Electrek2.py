@@ -7,7 +7,7 @@ import pandas as pd
 storiesdf = []
 pagenumber = 1
 newrecord = True
-articles_file = "/home/john/PycharmProjects/EVNews/electrek_articles.csv"
+articles_file = "electrek_articles.csv"
 
 df1 = pd.read_csv(articles_file, encoding='utf-8')
 storieslist = df1["title"].head(5).tolist()

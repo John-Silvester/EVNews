@@ -8,7 +8,7 @@ import datetime
 storiesdf = []
 pagenumber = 1
 newrecord = True
-articles_file = "/home/john/PycharmProjects/EVNews/insideevs_articles.csv"
+articles_file = "insideevs_articles.csv"
 
 df1 = pd.read_csv(articles_file)
 storieslist = df1["title"].head(5).tolist()
