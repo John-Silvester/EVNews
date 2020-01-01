@@ -139,7 +139,7 @@ def electrive():
 
 @app.route("/updatearticles")
 def updatearticles():
-    subprocess.call([sys.executable, 'update_articles.py'])
+    subprocess.call([sys.executable, './update_articles.py'])
     return render_template("EV_home.html", title="Home")
 
 
