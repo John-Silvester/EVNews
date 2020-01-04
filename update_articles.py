@@ -1,21 +1,26 @@
 import subprocess
 import sys
+import concurrent.futures
+import time
 
-subprocess.call([sys.executable, 'Electrek2.py'])
-print("Electrek2 updated")
-subprocess.call([sys.executable, 'insideevs2.py'])
-print("insideevs2 updated")
-subprocess.call([sys.executable, 'teslarati2.py'])
-print("teslarati2 updated")
-subprocess.call([sys.executable, 'cleantechnica2.py'])
-print("cleantechnica2 updated")
-subprocess.call([sys.executable, 'electrive2.py'])
-print("electrive2 updated")
-subprocess.call([sys.executable, 'greencarguide2.py'])
-print("greencarguide2 updated")
-subprocess.call([sys.executable, 'greencarreports2.py'])
-print("greencarreports2 updated")
-subprocess.call([sys.executable, 'chargedevs2.py'])
-print("chargedevs2 updated")
+start = time.perf_counter()
 
-print("done")
+
+def get_new_articles(outlet):
+    subprocess.call([sys.executable, outlet])
+    return f'Done Updating...{outlet}'
+
+
+with concurrent.futures.ThreadPoolExecutor() as executor:
+    outlets = ['Electrek2.py', 'insideevs2.py', 'teslarati2.py',
+               'cleantechnica2.py', 'electrive2.py', 'greencarguide2.py',
+               'greencarreports2.py', 'chargedevs2.py']
+    results = executor.map(get_new_articles, outlets)
+
+    for result in results:
+        print(result)
+
+
+finish = time.perf_counter()
+
+print(f'Finished in {round(finish-start, 2)} second(s)')
