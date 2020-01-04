@@ -8,7 +8,7 @@ app = Flask(__name__)
 
 # set number of articles (snoa)
 snoa = 20
-temp_file = "temp_articles.csv"
+# temp_file = "temp_articles.csv"
 
 
 def retrieve_posts(source_file):
@@ -16,11 +16,12 @@ def retrieve_posts(source_file):
     # Use pandas to access data from CSV
     df1 = pd.read_csv(source_file, encoding='utf-8')
     df2 = df1.head(snoa)
-    # posts = df2.to_dict('list')
-    df2.to_csv(temp_file, index=False, encoding='utf-8')
+    posts = df2.to_dict('r')
+    # df2.to_csv(temp_file, index=False, encoding='utf-8')
     # Use DictReader to access data from CSV
-    f = open(temp_file, newline='', encoding="utf-8")
-    posts = csv.DictReader(f)
+    # f = open(temp_file, newline='', encoding="utf-8")
+    # posts = csv.DictReader(f)
+    # print(posts)
     return posts
 
 
@@ -156,12 +157,12 @@ def search():
         search_text = request.form['search']
         df2 = df1[df1.short_description.str.contains(search_text, case=False)]
         df2 = df2.head(snoa)
-        # posts = df2.to_dict()
-        df2.to_csv(temp_file, index=False, encoding='utf-8')
+        posts = df2.to_dict('r')
+        # df2.to_csv(temp_file, index=False, encoding='utf-8')
 
         # Use DictReader to access data from CSV
-        f = open(temp_file, newline='', encoding="utf-8")
-        posts = csv.DictReader(f)
+        # f = open(temp_file, newline='', encoding="utf-8")
+        # posts = csv.DictReader(f)
 
         return render_template('EV_article.html',
                                title='Search ' + source_search,
