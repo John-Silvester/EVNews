@@ -1,8 +1,6 @@
 from bs4 import BeautifulSoup
-# from urllib.request import urlopen
 import requests
 import pandas as pd
-# from datetime import date, timedelta
 from dateutil.parser import parse
 
 storiesdf = []
@@ -12,10 +10,9 @@ articles_file = "chargedevs_articles.csv"
 
 df1 = pd.read_csv(articles_file, encoding='utf-8')
 storieslist = df1["title"].head(5).tolist()
-print('chargedevs')
 
 while newrecord:
-    print('pass ', pagenumber)
+    print('Charged EVs pass ', pagenumber)
     headers = {
             'User-Agent': 'Mozilla/5.0 (X11; Linux x86_64) '
             'AppleWebKit/537.36 (KHTML, like Gecko) Chrome/78.0.3904.70 Safari/537.36'}
@@ -25,7 +22,6 @@ while newrecord:
     soup = BeautifulSoup(source, 'lxml')
 
     articles = soup.find_all("article")
-    # print(articles)
 
     for article in articles:
         if article.find('h3') is None:
@@ -59,25 +55,11 @@ while newrecord:
         storiesdf.append((article_date, article_title, article_body, article_link, article_image,
                           article_byline, article_image_alt, weboutlet))
 
-        # print()
-        # print(article_date)
-        # print(article_byline)
-        # print(article_title)
-        # print(article_body)
-        # print(article_link)
-        # print(article_image)
-        # print(article_image_alt)
-        # print(weboutlet)
-
     pagenumber = pagenumber + 1
-
 
 df2 = pd.DataFrame(storiesdf, columns=['date', 'title', 'short_description', 'article_link', 'image',
                                        'byline', 'alt', 'outlet'])
-# print(storiesdf)
-#
-# print(df1)
-# print(df2)
+
 frames = [df2, df1]
 df_final = pd.concat(frames, sort=False)
 

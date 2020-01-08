@@ -2,8 +2,6 @@ from urllib.request import urlopen
 from bs4 import BeautifulSoup
 import pandas as pd
 
-# from my_functions import stringclean
-
 storiesdf = []
 pagenumber = 1
 newrecord = True
@@ -11,9 +9,9 @@ articles_file = "electrek_articles.csv"
 
 df1 = pd.read_csv(articles_file, encoding='utf-8')
 storieslist = df1["title"].head(5).tolist()
-print('electrek')
+
 while newrecord:
-    print('pass ', pagenumber)
+    print('Electrek pass ', pagenumber)
     html = urlopen("https://electrek.co/page/" + str(pagenumber) + "/")
     soup = BeautifulSoup(html, "lxml")
 
@@ -44,10 +42,7 @@ while newrecord:
         article_body = article_body.decode("utf-8")
 
         article_image_url_step = article.find('img')
-        article_image_url = article_image_url_step
         article_image_url = article_image_url_step.get('src')
-        # article_image_url_step, d = str(article_image_url_step).split('?', 1)
-        # article_image_url = article_image_url_step.replace('<img src="', '')
 
         article_byline = article.find('span', itemprop='name').text
         article_byline = str(article_byline)

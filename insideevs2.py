@@ -2,8 +2,6 @@ from urllib.request import urlopen
 from bs4 import BeautifulSoup
 import pandas as pd
 import datetime
-# import subprocess
-# import sys
 
 storiesdf = []
 pagenumber = 1
@@ -12,10 +10,9 @@ articles_file = "insideevs_articles.csv"
 
 df1 = pd.read_csv(articles_file)
 storieslist = df1["title"].head(5).tolist()
-print('insideevs')
 
 while newrecord:
-    print('pass ', pagenumber)
+    print('Inside EVs pass ', pagenumber)
     url = 'https://insideevs.com'
     html = urlopen("https://insideevs.com/news/?p=" + str(pagenumber))
     soup = BeautifulSoup(html, "lxml")
@@ -33,7 +30,6 @@ while newrecord:
         # print(article_title)
         article_title = article_title.decode("utf-8")
         article_title = str(article_title)
-        # print(article_title)
         article_link_tag = article.find('h3')
         article_link_step = article_link_tag.find('a', href=True)
         article_link = article_link_step.get('href')
@@ -51,18 +47,14 @@ while newrecord:
         article_date = datetime.datetime.utcfromtimestamp(ts).strftime('%d-%m-%Y %H:%M:%S')
         article_body = article.find('a', 'text').text
         article_body = article_body.encode('utf-8')
-        # print(article_body)
         article_body = article_body.decode("utf-8")
         article_body = str(article_body)
-        # print(article_body)
         article_byline = article.find('span', 'name').text
         article_image_link = article.find('img', src=True)
         article_image = article_image_link.get('data-src')
         article_image_alt = article_image_link.get('alt')
         article_image_alt = article_image_alt.encode('utf-8')
-        # print(article_image_alt)
         article_image_alt = article_image_alt.decode("utf-8")
-        # print(article_image_alt)
         weboutlet = "Inside EVs"
 
         storiesdf.append((article_date, article_title, article_body, article_link, article_image,
@@ -72,13 +64,7 @@ while newrecord:
 
 df2 = pd.DataFrame(storiesdf, columns=['date', 'title', 'short_description', 'article_link', 'image',
                                        'byline', 'alt', 'outlet'])
-# print(storiesdf)
-#
-# print(df1)
-# print(df2)
 frames = [df2, df1]
 df_final = pd.concat(frames, sort=False)
 
 df_final.to_csv(articles_file, index=False, encoding='utf-8')
-
-# subprocess.call([sys.executable, 'ev_news_insideev.py'])

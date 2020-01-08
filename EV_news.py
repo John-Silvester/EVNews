@@ -1,5 +1,4 @@
-from flask import Flask, render_template, request, url_for
-import csv
+from flask import Flask, render_template, request
 import pandas as pd
 import subprocess
 import sys
@@ -8,7 +7,6 @@ app = Flask(__name__)
 
 # set number of articles (snoa)
 snoa = 20
-# temp_file = "temp_articles.csv"
 
 
 def retrieve_posts(source_file):
@@ -17,11 +15,6 @@ def retrieve_posts(source_file):
     df1 = pd.read_csv(source_file, encoding='utf-8')
     df2 = df1.head(snoa)
     posts = df2.to_dict('r')
-    # df2.to_csv(temp_file, index=False, encoding='utf-8')
-    # Use DictReader to access data from CSV
-    # f = open(temp_file, newline='', encoding="utf-8")
-    # posts = csv.DictReader(f)
-    # print(posts)
     return posts
 
 
@@ -36,7 +29,6 @@ def home():
 @app.route("/electrek", methods=['GET', 'POST'])
 def electrek():
     global snoa
-    # source_file = url_for('EVNews', filename='electrek_articles.csv')
     source_file = "electrek_articles.csv"
     if request.method == 'POST':
         snoa = int(request.form['page_num'])
@@ -148,22 +140,14 @@ def updatearticles():
 def search():
     global snoa
     if request.method == 'POST':
-        # page_num = int(request.form['page_num'])
         source_search = request.form['outlet']
         source_file = source_search + "_articles.csv"
         source_file = source_file.replace("/", "")
-        # Use pandas to access data from CSV
         df1 = pd.read_csv(source_file, encoding='utf-8')
         search_text = request.form['search']
         df2 = df1[df1.short_description.str.contains(search_text, case=False)]
         df2 = df2.head(snoa)
         posts = df2.to_dict('r')
-        # df2.to_csv(temp_file, index=False, encoding='utf-8')
-
-        # Use DictReader to access data from CSV
-        # f = open(temp_file, newline='', encoding="utf-8")
-        # posts = csv.DictReader(f)
-
         return render_template('EV_article.html',
                                title='Search ' + source_search,
                                posts=posts,
