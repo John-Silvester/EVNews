@@ -117,6 +117,19 @@ def chargedevs():
                            outlet_page="/chargedevs")
 
 
+@app.route("/reneweconomy", methods=['GET', 'POST'])
+def reneweconomy():
+    global snoa
+    source_file = "reneweconomy_articles.csv"
+    if request.method == 'POST':
+        snoa = int(request.form['page_num'])
+    posts = retrieve_posts(source_file)
+    return render_template("EV_article.html",
+                           posts=posts,
+                           title="Renew Economy",
+                           outlet_page="/reneweconomy")
+
+
 @app.route("/electrive", methods=['GET', 'POST'])
 def electrive():
     global snoa
