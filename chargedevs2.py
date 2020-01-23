@@ -14,8 +14,8 @@ storieslist = df1["title"].head(5).tolist()
 while newrecord:
     print('Charged EVs pass ', pagenumber)
     headers = {
-            'User-Agent': 'Mozilla/5.0 (X11; Linux x86_64) '
-            'AppleWebKit/537.36 (KHTML, like Gecko) Chrome/78.0.3904.70 Safari/537.36'}
+            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) '
+                          'AppleWebKit/537.36 (KHTML, like Gecko) Chrome/79.0.3945.117 Safari/537.36'}
 
     source = requests.get('https://chargedevs.com/category/newswire/page/' + str(pagenumber) + "/",
                           headers=headers).text

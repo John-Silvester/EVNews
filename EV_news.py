@@ -130,6 +130,45 @@ def reneweconomy():
                            outlet_page="/reneweconomy")
 
 
+@app.route("/evobsession", methods=['GET', 'POST'])
+def evobsession():
+    global snoa
+    source_file = "evobsession_articles.csv"
+    if request.method == 'POST':
+        snoa = int(request.form['page_num'])
+    posts = retrieve_posts(source_file)
+    return render_template("EV_article.html",
+                           posts=posts,
+                           title="EV Obsession",
+                           outlet_page="/evobsession")
+
+
+@app.route("/autoblog", methods=['GET', 'POST'])
+def autoblog():
+    global snoa
+    source_file = "autoblog_articles.csv"
+    if request.method == 'POST':
+        snoa = int(request.form['page_num'])
+    posts = retrieve_posts(source_file)
+    return render_template("EV_article.html",
+                           posts=posts,
+                           title="autoblog - green",
+                           outlet_page="/autoblog")
+
+
+@app.route("/thevergecars", methods=['GET', 'POST'])
+def thevergecars():
+    global snoa
+    source_file = "thevergecars_articles.csv"
+    if request.method == 'POST':
+        snoa = int(request.form['page_num'])
+    posts = retrieve_posts(source_file)
+    return render_template("EV_article.html",
+                           posts=posts,
+                           title="The Verge - cars",
+                           outlet_page="/thevergecars")
+
+
 @app.route("/electrive", methods=['GET', 'POST'])
 def electrive():
     global snoa

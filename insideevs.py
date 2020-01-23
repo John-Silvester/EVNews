@@ -37,7 +37,7 @@ for article in articles:
 
     article_date_step = article_date_step.replace('"', '')
     ts = int(article_date_step)
-    article_date = datetime.datetime.utcfromtimestamp(ts).strftime('%d-%m-%Y %H:%M:%S')
+    article_date = datetime.datetime.utcfromtimestamp(ts).strftime('%Y-%m-%d %H:%M:%S')
     article_body = article.find('a', 'text').text
     article_body = article_body.encode('utf-8')
     article_body = article_body.decode("utf-8")

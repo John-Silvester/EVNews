@@ -5,15 +5,18 @@
 # import pandas as pd
 # from datetime import date, timedelta
 #
-# articles_file = '/home/john/PycharmProjects/EVNews/electrive_articles.csv'
+# articles_file = 'thevergecars_articles.csv'
+# headers = {
+#     'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) '
+#                   'AppleWebKit/537.36 (KHTML, like Gecko) Chrome/79.0.3945.117 Safari/537.36'}
 #
-# source = requests.get('https://www.electrive.com/category/automobile/page/2/').text
+# source = requests.get('https://www.theverge.com/cars/archives/2', headers=headers).text
 #
 # soup = BeautifulSoup(source, 'lxml')
 #
 # articles = soup.find_all("article", "teaser row")
 # # print(article)
-#
+
 # storiesdf = []
 #
 # for article in articles:

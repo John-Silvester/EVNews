@@ -1,17 +1,16 @@
 from bs4 import BeautifulSoup
-# from urllib.request import urlopen
 import requests
 import pandas as pd
 from datetime import date, timedelta
 
-articles_file = '/home/john/PycharmProjects/EVNews/teslarati_articles.csv'
+articles_file = 'teslarati_articles.csv'
 
 source = requests.get('https://www.teslarati.com/category/news/page/20/').text
 
 soup = BeautifulSoup(source, 'lxml')
 
 articles = soup.find_all('li', class_='infinite-post')
-# print(articles)
+
 storiesdf = []
 
 for article in articles:
@@ -37,19 +36,8 @@ for article in articles:
 
     storiesdf.append((article_date, article_title, article_body, article_link, article_image,
                       article_byline, article_image_alt, weboutlet))
-    #
-    # print(article_date)
-    # print(article_byline)
-    #
-    # print(article_title)
-    # print(article_body)
-    # print(article_link)
-    # print(article_image_url)
-    # print(article_image_alt)
-    # print(weboutlet)
 
 df = pd.DataFrame(storiesdf, columns=['date', 'title', 'short_description', 'article_link', 'image',
                                       'byline', 'alt', 'outlet'])
-# df['date'] = pd.to_datetime(df['date'])
 
 df.to_csv(articles_file, index=False, encoding='utf-8')

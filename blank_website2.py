@@ -8,15 +8,20 @@
 # storiesdf = []
 # pagenumber = 1
 # newrecord = True
-# articles_file = "/home/john/PycharmProjects/EVNews/cleantechnica_articles.csv"
+# articles_file = "sitename_articles.csv"
 #
 # df1 = pd.read_csv(articles_file, encoding='utf-8')
 # storieslist = df1["title"].head(5).tolist()
 # print(df1)
 #
 # while newrecord:
+#     print('Charged EVs pass ', pagenumber)
+#     headers = {
+#             'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) '
+#                           'AppleWebKit/537.36 (KHTML, like Gecko) Chrome/79.0.3945.117 Safari/537.36'}
 #
-#     source = requests.get('https://cleantechnica.com/category/clean-transport-2/page/' + str(pagenumber) + "/").text
+#     source = requests.get('https://chargedevs.com/category/newswire/page/' + str(pagenumber) + "/",
+#                           headers=headers).text
 #
 #     soup = BeautifulSoup(source, 'lxml')
 #

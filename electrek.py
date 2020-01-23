@@ -19,8 +19,8 @@ for article in articles:
         continue
     article_title = article.find('h1', 'post-title').text
 
-    # article_title = article_title.encode('utf-8')
-    # article_title = article_title.decode("utf-8")
+    article_title = article_title.encode('utf-8')
+    article_title = article_title.decode("utf-8")
 
     article_link_tag = article.find('h1', 'post-title')
     article_link_step = article_link_tag.find('a', href=True)
@@ -29,7 +29,6 @@ for article in articles:
     article_datetime = article.find('p', 'time-twitter').text.strip()
     article_datetime = article_datetime.replace('- ', '')
     article_datetime = article_datetime.replace(' ET', '')
-
     article_body = article.find('div', "post-body").text.strip()
     article_body = article_body.replace('expand full story', '', -1)
     article_body = article_body.replace('\n', '', -1)

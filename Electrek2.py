@@ -1,6 +1,7 @@
 from urllib.request import urlopen
 from bs4 import BeautifulSoup
 import pandas as pd
+from dateutil.parser import parse
 
 storiesdf = []
 pagenumber = 1
@@ -34,6 +35,7 @@ while newrecord:
         article_datetime = article.find('p', 'time-twitter').text.strip()
         article_datetime = article_datetime.replace('- ', '')
         article_datetime = article_datetime.replace(' ET', '')
+        article_datetime = parse(article_datetime)
 
         article_body = article.find('div', "post-body").text.strip()
         article_body = article_body.replace('expand full story', '', -1)
@@ -42,7 +44,10 @@ while newrecord:
         article_body = article_body.decode("utf-8")
 
         article_image_url_step = article.find('img')
-        article_image_url = article_image_url_step.get('src')
+        if article.find('img') is None:
+            article_image_url = "no image"
+        else:
+            article_image_url = article_image_url_step.get('src')
 
         article_byline = article.find('span', itemprop='name').text
         article_byline = str(article_byline)
@@ -60,7 +65,7 @@ while newrecord:
 #
 df2 = pd.DataFrame(storiesdf, columns=['date', 'title', 'short_description', 'article_link', 'image',
                                        'byline', 'alt', 'outlet'])
-df2['date'] = pd.to_datetime(df2['date'])
+
 
 
 frames = [df2, df1]

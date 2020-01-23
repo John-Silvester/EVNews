@@ -13,12 +13,15 @@ storieslist = df1["title"].head(5).tolist()
 
 while newrecord:
     print('Electrive pass ', pagenumber)
-    source = requests.get('https://www.electrive.com/category/automobile/page/' + str(pagenumber) + "/").text
-
+    if pagenumber == 1:
+        source = requests.get('https://www.electrive.com/category/automobile/').text
+    else:
+        source = requests.get('https://www.electrive.com/category/automobile/page/' + str(pagenumber) + "/").text
+    # print(source)
     soup = BeautifulSoup(source, 'lxml')
 
     articles = soup.find_all("article", "teaser row")
-
+    # print(articles)
     for article in articles:
         if article.find('h3') is None:
             continue
