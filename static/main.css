@@ -15,7 +15,8 @@ figure {
 img {
   border: 1px solid #ddd;
   border-radius: 4px;
-  width: 600px;
+  width: 700px;
+  align="middle";
 
 }
 
@@ -32,7 +33,7 @@ footer li {
 }
 
 #wraper {
-        width: 1000px;
+        width: 1200px;
         background-color: gray;
         margin: auto;
 }
@@ -78,4 +79,9 @@ footer {
     background-color: lightblue;
     clear: left;
     border-radius: 15px;
+}
+
+iframe {
+    bordercolor="#FFFFFF";
+
 }
