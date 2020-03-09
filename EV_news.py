@@ -76,17 +76,42 @@ def about():
     return render_template('about.html', title='About')
 
 
+@app.route("/carsales", endpoint='carsales')
 @app.route("/ev_database", endpoint='ev_database')
 @app.route("/evdb", endpoint='evdb')
 def evdb():
     if request.endpoint == 'ev_database':
         web_address = "https://ev-database.org/"
-    else:
+        title = "EV Database"
+    elif request.endpoint == "evdb":
         web_address = "https://evdb.io/ev?sort=1&carType=car&evType=EV"
+        title = "EV DB"
+    else:
+        web_address = "https://www.carsales.com.au/cars/queensland-state/brisbane-all-region/electric-fueltype/" \
+                      "?sort=LastUpdated"
+        title = request.endpoint
+
     return render_template('EV_DB.html',
-                           title='EV DB',
+                           title=title,
+                           web_address=web_address)
+
+
+@app.route("/web/<site_name>", methods=['GET', 'POST'])
+def iframesites(site_name):
+    global snoa
+    sitetitles_file = "siteaddresses.csv"
+    pd.options.display.max_colwidth = 120
+    df1 = pd.read_csv(sitetitles_file, encoding='utf-8')
+    df1 = df1[df1.site.str.contains(site_name, case=False)]
+
+    title = df1['title']
+    title = title.to_string(index=False).strip()
+    web_address = df1['web_address']
+    web_address = web_address.to_string(index=False).strip()
+    return render_template('EV_DB.html',
+                           title=title,
                            web_address=web_address)
 
 
 if __name__ == '__main__':
-    app.run(debug=True, port=5001)
+    app.run(host='0.0.0.0', debug=True, port=5001)

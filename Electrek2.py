@@ -39,7 +39,7 @@ while newrecord:
 
         article_body = article.find('div', "post-body").text.strip()
         article_body = article_body.replace('expand full story', '', -1)
-        article_body = article_body.replace('\n', '', -1)
+        article_body = article_body.replace('\n', ' ', -1)
         article_body = article_body.encode('utf-8')
         article_body = article_body.decode("utf-8")
 

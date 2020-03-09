@@ -9,7 +9,7 @@ headers = {
     'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) '
                   'AppleWebKit/537.36 (KHTML, like Gecko) Chrome/79.0.3945.117 Safari/537.36'}
 
-source = requests.get('https://www.autoblog.com/green/pg-20/#', headers=headers).text
+source = requests.get('https://www.autoblog.com/green/pg-19/#', headers=headers).text
 
 soup = BeautifulSoup(source, 'lxml')
 
