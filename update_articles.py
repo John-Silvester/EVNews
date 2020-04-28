@@ -12,10 +12,10 @@ def get_new_articles(outlet):
 
 
 with concurrent.futures.ThreadPoolExecutor() as executor:
-    outlets = ['Electrek2.py', 'insideevs2.py', 'teslarati2.py',
-               'cleantechnica2.py', 'electrive2.py', 'reneweconomy2.py',
-               'greencarguide2.py', 'greencarreports2.py', 'chargedevs2.py',
-               'evobsession2.py', 'thevergecars2.py']
+    outlets = ['Electrek.py', 'insideevs.py', 'teslarati.py',
+               'cleantechnica.py', 'electrive.py', 'reneweconomy.py',
+               'greencarguide.py', 'greencarreports.py', 'chargedevs.py',
+               'evobsession.py', 'thevergecars.py']
     # , 'autoblog2.py'
     results = executor.map(get_new_articles, outlets)
 

@@ -1,67 +1,81 @@
+# from bs4 import BeautifulSoup
+# import pandas as pd
+# from dateutil.parser import parse
 
-from urllib.request import urlopen
-from bs4 import BeautifulSoup
-import pandas as pd
 import datetime
-# import time
-# import subprocess
-# import sys
+from my_functions import *
 
-articles_file = "/home/john/PycharmProjects/EVNews/insideevs_articles.csv"
-url = 'https://insideevs.com'
-html = urlopen("https://insideevs.com/news/?p=50")
-soup = BeautifulSoup(html, "lxml")
 
-articles = soup.find_all("div", "item")
-
+storieslist = []
 storiesdf = []
-# print(articles)
-for article in articles:
-    if article.find('h3') is None:
-        continue
-    article_title = article.find('h3').text
-    article_title = article_title.encode('utf-8')
-    article_title = article_title.decode("utf-8")
-
-    article_link_tag = article.find('h3')
-    article_link_step = article_link_tag.find('a', href=True)
-    article_link = article_link_step.get('href')
-    if not article_link.startswith('http'):
-        article_link = url+article_link
-    article_date_tag = article.find('span', 'date')
-    if article_date_tag is None:
-        continue
-    article_date_step = str(article_date_tag).split('=')[2]
-
-    article_date_step = str(article_date_step).split('>')[0]
-
-    article_date_step = article_date_step.replace('"', '')
-    ts = int(article_date_step)
-    article_date = datetime.datetime.utcfromtimestamp(ts).strftime('%Y-%m-%d %H:%M:%S')
-    article_body = article.find('a', 'text').text
-    article_body = article_body.encode('utf-8')
-    article_body = article_body.decode("utf-8")
-
-    article_byline = article.find('span', 'name').text
-    article_image_link = article.find('img', src=True)
-    article_image = article_image_link.get('data-src')
-    article_image_alt = article_image_link.get('alt')
-
-    weboutlet = "Inside EVs"
-
-    storiesdf.append((article_date, article_title, article_body, article_link, article_image,
-                      article_byline, article_image_alt, weboutlet))
+pagenumber = 1
+newrecord = True
+articles_file = "insideevs_articles.csv"
+article_setup = False
+weboutlet = 'Inside EVs'
 
 
-df = pd.DataFrame(storiesdf, columns=['date', 'title', 'short_description', 'article_link', 'image',
-                                      'byline', 'alt', 'outlet'])
-# df['date'] = pd.to_datetime(df['date'])
-df.to_csv(articles_file, index=False, encoding='utf-8')
+def main():
+    global newrecord, pagenumber, storiesdf, storieslist, weboutlet, articles_file, article_setup
+    df1 = pd.DataFrame(columns=['date', 'title', 'short_description', 'article_link', 'image',
+                                'byline', 'alt', 'outlet'])
+    if not article_setup:
+        df1 = pd.read_csv(articles_file, encoding='utf-8')
+        storieslist = df1["title"].head(10).tolist()
+
+    while newrecord:
+        print('Inside EVs pass ', pagenumber)
+        url = 'https://insideevs.com'
+
+        soup = make_soup("https://insideevs.com/news/?p=" + str(pagenumber))
+
+        articles = soup.find_all("div", "item")
+
+        for article in articles:
+            if get_element(article, 'h3', clean_str=False) == 'Empty':
+                continue
+            article_title = get_element(article, 'h3', text=True)
+            if any(article_title in x for x in storieslist):
+                newrecord = False
+                break
+
+            article_link = get_tag_attribute(article, 'a', 'href')
+            if not article_link.startswith('http'):
+                article_link = url+article_link
+
+            article_date = get_tag_attribute(article, 'span', 'data-time', tag_class='date')
+            if article_date == 'not_found':
+                continue
+
+            ts = int(article_date)
+            article_date = datetime.datetime.utcfromtimestamp(ts).strftime('%Y-%m-%d %H:%M:%S')
+
+            article_body = get_element(article, 'a', 'text', text=True)
+
+            article_byline = get_element(article, 'span', 'name', text=True)
+
+            article_image = get_tag_attribute(article, 'img', 'data-src')
+
+            article_image_alt = get_tag_attribute(article, 'img', 'alt')
+
+            # print()
+            # print(article_title)
+            # print(article_date)
+            # print(article_image)
+
+            storiesdf.append((article_date, article_title, article_body, article_link, article_image,
+                              article_byline, article_image_alt, weboutlet))
+
+        if article_setup:
+            newrecord = False
+            break
+        pagenumber += 1
+
+    if article_setup:
+        setup_articles(storiesdf, weboutlet, articles_file)
+    else:
+        update_articles(df1, storiesdf, weboutlet, articles_file)
 
 
-# subprocess.call([sys.executable, 'ev_news_insideev.py'])
-
-#
-# time.sleep(2)
-#
-# print("I hope I waited")
+if __name__ == '__main__':
+    main()

@@ -9,7 +9,7 @@ newrecord = True
 articles_file = "reneweconomy_articles.csv"
 
 df1 = pd.read_csv(articles_file, encoding='utf-8')
-storieslist = df1["title"].head(5).tolist()
+storieslist = df1["title"].head(10).tolist()
 # print(df1)
 
 while newrecord:
@@ -53,6 +53,7 @@ while newrecord:
 
         article_date = article.find('time').text
         article_date = parse(article_date)
+
         if article.find("url fn n") is None:
             article_byline = article.find("a", "url fn n").text
         else:

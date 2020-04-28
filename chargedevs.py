@@ -1,53 +1,73 @@
-from bs4 import BeautifulSoup
-import requests
+# from bs4 import BeautifulSoup
+# import requests
+# import pandas as pd
 from dateutil.parser import parse
-import pandas as pd
+from my_functions import *
 
-articles_file = 'chargedevs_articles.csv'
-
-headers = {
-    'User-Agent': 'Mozilla/5.0 (X11; Linux x86_64) '
-                  'AppleWebKit/537.36 (KHTML, like Gecko) Chrome/78.0.3904.70 Safari/537.36'}
-
-source = requests.get('https://chargedevs.com/category/newswire/page/2/', headers=headers).text
-
-soup = BeautifulSoup(source, 'lxml')
-
-articles = soup.find_all("article")
-# print(articles)
-
+storieslist = []
 storiesdf = []
+pagenumber = 1
+newrecord = True
+articles_file = "chargedevs_articles.csv"
+article_setup = False
+weboutlet = "Charged EVs"
 
-for article in articles:
-    if article.find('h3') is None:
-        continue
-    article_title = article.find('h3').text
-    article_title = article_title.encode('utf-8')
-    article_title = article_title.decode("utf-8")
 
-    article_body = article.find('section', "entry-content clearfix").text
-    article_body = article_body.strip()
-    article_body = article_body.replace("…  Read more »", "")
+def main():
+    global newrecord, pagenumber, storiesdf, storieslist, weboutlet, articles_file, article_setup
+    df1 = pd.DataFrame(columns=['date', 'title', 'short_description', 'article_link', 'image',
+                                'byline', 'alt', 'outlet'])
+    if not article_setup:
+        df1 = pd.read_csv(articles_file, encoding='utf-8')
+        storieslist = df1["title"].head(10).tolist()
 
-    article_image_url = article.find('img')
-    article_image = article_image_url.get('src')
+    while newrecord:
+        print(weboutlet, ' page ', pagenumber, '\n')
 
-    article_date = article.find('time').text
-    article_date = parse(article_date)
+        soup = make_soup('https://chargedevs.com/category/newswire/page/' + str(pagenumber) + "/")
 
-    article_byline = article.find("span", "author").text
+        articles = soup.find_all("article")
 
-    article_link = article.find('div', "fourcol first featimg").a
-    article_link = article_link.get('href')
+        for article in articles:
+            if get_element(article, 'h3', clean_str=False) == 'Empty':
+                continue
+            article_title = get_element(article, 'h3', text=True)
+            if any(article_title in x for x in storieslist):
+                newrecord = False
+                break
 
-    weboutlet = "Charged EVs"
+            article_body = get_element(article, 'section', "entry-content clearfix", text=True)
+            article_body = article_body.replace("  Read more »", "")
 
-    article_image_alt = "Image not found"
+            article_image = get_tag_attribute(article, 'img', 'src')
+            article_image = article_image.replace('-150x150', '-300x300')
 
-    storiesdf.append((article_date, article_title, article_body, article_link, article_image,
-                      article_byline, article_image_alt, weboutlet))
+            article_date = parse(get_element(article, 'time', text=True))
 
-df = pd.DataFrame(storiesdf, columns=['date', 'title', 'short_description', 'article_link', 'image',
-                                      'byline', 'alt', 'outlet'])
+            article_link = get_element(article, 'div', "fourcol first featimg", clean_str=False)
+            article_link = get_tag_attribute(article_link, 'a', 'href')
 
-df.to_csv(articles_file, index=False, encoding='utf-8')
+            article_byline = get_element(article, "span", "author", text=True)
+
+            article_image_alt = "Image not found"
+
+            # print()
+            # print(article_title)
+            # print(article_byline)
+
+            storiesdf.append((article_date, article_title, article_body, article_link, article_image,
+                              article_byline, article_image_alt, weboutlet))
+
+        if article_setup:
+            newrecord = False
+            break
+        pagenumber += 1
+
+    if article_setup:
+        setup_articles(storiesdf, weboutlet, articles_file)
+    else:
+        update_articles(df1, storiesdf, weboutlet, articles_file)
+
+
+if __name__ == '__main__':
+    main()

@@ -1,43 +1,71 @@
-from bs4 import BeautifulSoup
-import requests
-import pandas as pd
+# from bs4 import BeautifulSoup
+# import requests
+# import pandas as pd
 from datetime import date, timedelta
+from my_functions import *
 
-articles_file = 'teslarati_articles.csv'
-
-source = requests.get('https://www.teslarati.com/category/news/page/20/').text
-
-soup = BeautifulSoup(source, 'lxml')
-
-articles = soup.find_all('li', class_='infinite-post')
-
+storieslist = []
 storiesdf = []
+pagenumber = 1
+newrecord = True
+articles_file = "teslarati_articles.csv"
+article_setup = False
+weboutlet = "Teslarati"
 
-for article in articles:
-    if article.find('h2') is None:
-        continue
-    article_title = article.find('h2').text
-    article_title = article_title.encode('utf-8')
-    article_title = article_title.decode("utf-8")
 
-    article_body = article.find('p').text
+def main():
+    global newrecord, pagenumber, storiesdf, storieslist, weboutlet, articles_file, article_setup
+    df1 = pd.DataFrame(columns=['date', 'title', 'short_description', 'article_link', 'image',
+                                'byline', 'alt', 'outlet'])
+    if not article_setup:
+        df1 = pd.read_csv(articles_file, encoding='utf-8')
+        storieslist = df1["title"].head(10).tolist()
 
-    article_image_url = article.find('div', class_="archive-list-out").div.img
-    article_image = article_image_url.get('src')
+    while newrecord:
+        print('Teslarati pass ', pagenumber)
+        soup = make_soup('https://www.teslarati.com/category/news/page/' + str(pagenumber) + "/")
 
-    article_link = article.find('a')
-    article_link = article_link.get('href')
+        articles = soup.find_all('li', class_='infinite-post')
 
-    weboutlet = "Teslarati"
-    article_image_alt = "Image not found"
+        for article in articles:
+            if get_element(article, 'h2', clean_str=False) == 'Empty':
+                continue
+            article_title = get_element(article, 'h2', text=True)
+            if any(article_title in x for x in storieslist):
+                newrecord = False
+                break
 
-    article_date = date.today() - timedelta(62)
-    article_byline = ""
+            article_body = article.find('p').text
 
-    storiesdf.append((article_date, article_title, article_body, article_link, article_image,
-                      article_byline, article_image_alt, weboutlet))
+            article_image = get_tag_attribute(article, 'img', 'src')
+            article_image = article_image.replace('450x270', '1000x600')
 
-df = pd.DataFrame(storiesdf, columns=['date', 'title', 'short_description', 'article_link', 'image',
-                                      'byline', 'alt', 'outlet'])
+            article_link = get_tag_attribute(article, 'a', 'href')
 
-df.to_csv(articles_file, index=False, encoding='utf-8')
+            article_image_alt = "Image not found"
+
+            article_date = date.today() - timedelta(1)
+
+            article_byline = ""
+
+            # print()
+            # print(article_title)
+            # print(article_date)
+            # print(article_link)
+
+            storiesdf.append((article_date, article_title, article_body, article_link, article_image,
+                              article_byline, article_image_alt, weboutlet))
+
+        if article_setup:
+            newrecord = False
+            break
+        pagenumber += 1
+
+    if article_setup:
+        setup_articles(storiesdf, weboutlet, articles_file)
+    else:
+        update_articles(df1, storiesdf, weboutlet, articles_file)
+
+
+if __name__ == '__main__':
+    main()

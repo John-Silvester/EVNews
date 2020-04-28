@@ -1,18 +1,23 @@
-import pandas as pd
+x = 1
+counting = True
 
-site_name = "carsales"
-sitetitles_file = "siteaddresses.csv"
-pd.options.display.max_colwidth = 120
-df1 = pd.read_csv(sitetitles_file, encoding='utf-8')
-df1 = df1[df1.site.str.contains(site_name, case=False)]
+def check_for_seven(inputint):
+    if inputint == 7:
+        print(f'{inputint} is equal to seven')
+        return True
 
-title = df1['title']
-title = title.to_string(index=False).strip()
-outlet_page = "/web/" + df1['site']
-outlet_page = outlet_page.to_string(index=False).strip()
-web_address = df1['web_address']
-web_address = web_address.to_string(index=False).strip()
+def check_for_ten(inputint):
+    if inputint == 10:
+        print('Leaving')
+        return True
 
-print(title)
-print(outlet_page)
-print(web_address)
+while counting:
+    if check_for_seven(x):
+        x = x + 1
+        continue
+    print(f'{x} is not seven')
+    if check_for_ten(x):
+        break
+    x = x+1
+
+print('finished')

@@ -35,8 +35,8 @@ while newrecord:
 
         article_body = article.find('p', "omc-blog-two-exceprt").text
 
-        article_image_url = article.find('img')
-        article_image = article_image_url.get('src')
+        article_image = article.find('img').get('src')
+        article_image = article_image.replace("-290x166", "")
 
         article_date = article.find('p', class_="omc-blog-two-date").text
         article_date, article_byline = article_date.split('|')
@@ -49,6 +49,8 @@ while newrecord:
         article_link = article_link.get('href')
         weboutlet = "CleanTechnica"
         article_image_alt = "Image not found"
+
+        # print(article_image)
 
         storiesdf.append((article_date, article_title, article_body, article_link, article_image,
                           article_byline, article_image_alt, weboutlet))

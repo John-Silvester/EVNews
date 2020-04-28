@@ -1,66 +1,75 @@
-from bs4 import BeautifulSoup
-# from urllib.request import urlopen
-import requests
+# from bs4 import BeautifulSoup
+# import requests
+# import pandas as pd
 from dateutil.parser import parse
-import pandas as pd
-from datetime import date, timedelta
+from my_functions import *
 
-articles_file = '/home/john/PycharmProjects/EVNews/cleantechnica_articles.csv'
-
-source = requests.get('https://cleantechnica.com/category/clean-transport-2/page/3/').text
-
-soup = BeautifulSoup(source, 'lxml')
-
-articles = soup.find_all("article", "omc-blog-two omc-half-width-category")
-# print(article)
-
+storieslist = []
 storiesdf = []
-
-for article in articles:
-    if article.find('h2').a is None:
-        continue
-    article_title = article.find('h2').a.text
-    article_title = article_title.encode('utf-8')
-    article_title = article_title.decode("utf-8")
-
-    article_body = article.find('p', "omc-blog-two-exceprt").text
-
-    article_image_url = article.find('img')
-    article_image = article_image_url.get('src')
-
-    article_date = article.find('p', class_="omc-blog-two-date").text
-    article_date, article_byline = article_date.split('|')
-    article_date = article_date.strip()
-    article_date = parse(article_date)
-    article_byline = article_byline.strip()
-
-    article_link = article.find_all('a')
-    _, article_link, *args = article_link
-    article_link = article_link.get('href')
-    weboutlet = "CleanTechnica"
-    article_image_alt = "Image not found"
+pagenumber = 1
+newrecord = True
+articles_file = "cleantechnica_articles.csv"
+article_setup = False
+weboutlet = 'CleanTechnica'
 
 
-    storiesdf.append((article_date, article_title, article_body, article_link, article_image,
-                      article_byline, article_image_alt, weboutlet))
-    #
-    # print()
-    #
-    # print(article_date)
-    # print(article_title)
-    # print(article_body)
-    # print(article_link)
-    # print(article_image)
-    # print(article_byline)
-    # print(article_image_alt)
-    # print(weboutlet)
-    #
+def main():
+    global newrecord, pagenumber, storiesdf, storieslist, weboutlet, articles_file, article_setup
+    df1 = pd.DataFrame(columns=['date', 'title', 'short_description', 'article_link', 'image',
+                                'byline', 'alt', 'outlet'])
+    if not article_setup:
+        df1 = pd.read_csv(articles_file, encoding='utf-8')
+        storieslist = df1["title"].head(10).tolist()
+
+    while newrecord:
+        print(weboutlet, ' page ', pagenumber, '\n')
+
+        soup = make_soup('https://cleantechnica.com/category/clean-transport-2/page/' + str(pagenumber) + "/")
+
+        articles = soup.find_all("article", "omc-blog-two omc-half-width-category")
+
+        for article in articles:
+            if get_element(article, 'h2', clean_str=False) == 'Empty':
+                continue
+            article_title = get_element(article, 'h2', text=True)
+            if any(article_title in x for x in storieslist):
+                newrecord = False
+                break
+
+            article_title = make_utf8(article_title)
+
+            article_body = get_element(article, 'p', "omc-blog-two-exceprt", text=True)
+
+            article_image = get_tag_attribute(article, 'img', 'src')
+            article_image = article_image.replace("-290x166", "")
+
+            article_date = get_element(article, 'p', "omc-blog-two-date", text=True)
+            article_date, article_byline = article_date.split('|')
+            article_date = parse(article_date.strip())
+
+            article_byline = article_byline.strip()
+
+            article_link = get_element(article, 'div', 'omc-blog-two-text', clean_str=False)
+            article_link = get_tag_attribute(article_link, 'a', 'href')
+
+            article_image_alt = "Image not found"
+
+            # print(article_title)
+            # print(weboutlet)
+
+            storiesdf.append((article_date, article_title, article_body, article_link, article_image,
+                              article_byline, article_image_alt, weboutlet))
+
+        if article_setup:
+            newrecord = False
+            break
+        pagenumber += 1
+
+    if article_setup:
+        setup_articles(storiesdf, weboutlet, articles_file)
+    else:
+        update_articles(df1, storiesdf, weboutlet, articles_file)
 
 
-
-
-df = pd.DataFrame(storiesdf, columns=['date', 'title', 'short_description', 'article_link', 'image',
-                                      'byline', 'alt', 'outlet'])
-# df['date'] = pd.to_datetime(df['date'])
-
-df.to_csv(articles_file, index=False, encoding='utf-8')
+if __name__ == '__main__':
+    main()

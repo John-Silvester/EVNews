@@ -8,9 +8,9 @@ storieslist = []
 storiesdf = []
 pagenumber = 1
 newrecord = True
-articles_file = "electrive_articles.csv"
+articles_file = "electrek_articles.csv"
 article_setup = False
-weboutlet = 'electrive'
+weboutlet = "Electrek"
 
 
 def main():
@@ -23,39 +23,40 @@ def main():
 
     while newrecord:
         print(weboutlet, ' page ', pagenumber, '\n')
-        if pagenumber == 1:
-            soup = make_soup('https://www.electrive.com/category/automobile/')
-        else:
-            soup = make_soup('https://www.electrive.com/category/automobile/page/' + str(pagenumber) + "/")
+        soup = make_soup("https://electrek.co/page/" + str(pagenumber) + "/")
 
-        articles = soup.find_all("article", "teaser row")
+        articles = soup.find_all("article", "post-content")
 
         for article in articles:
-            if get_element(article, 'h3', clean_str=False) is None:
+            if get_element(article, 'h1', 'post-title', clean_str=False) == 'Empty':
                 continue
-            article_title = get_element(article, 'h3', text=True)
+            article_title = get_element(article, 'h1', 'post-title', text=True)
             if any(article_title in x for x in storieslist):
                 newrecord = False
                 break
 
-            article_body = get_element(article, 'p', text=True)
+            article_link = get_element(article, 'h1', 'post-title', clean_str=False)
+            article_link = get_tag_attribute(article_link, 'a', 'href')
 
-            article_image = get_tag_attribute(article, 'img', 'src')
-            article_image = article_image.replace('-300x150', '')
+            article_datetime = get_element(article, 'p', 'time-twitter', text=True)
+            article_datetime = article_datetime.replace('- ', '')
+            article_datetime = parse(article_datetime.replace(' ET', ''))
 
-            article_date = parse(get_element(article, 'span', "meta", text=True))
+            article_body = get_element(article, 'div', "post-body", text=True)
+            article_body = article_body.replace('expand full story', '', -1)
 
-            article_link = get_tag_attribute(article, 'a', 'href')
+            article_image_url = get_tag_attribute(article, 'img', 'src')
+            article_image_url, _ = article_image_url.split('?')
 
-            article_byline = "byline unknown"
+            article_byline = article.find('span', itemprop='name').text
+            article_byline = str(make_utf8(article_byline))
+
             article_image_alt = "Image not found"
 
-            # print()
             # print(article_title)
             # print(article_link)
-            # print(article_body)
 
-            storiesdf.append((article_date, article_title, article_body, article_link, article_image,
+            storiesdf.append((article_datetime, article_title, article_body, article_link, article_image_url,
                               article_byline, article_image_alt, weboutlet))
 
         if article_setup:

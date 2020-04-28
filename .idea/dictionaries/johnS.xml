@@ -5,6 +5,8 @@
       <w>bordercolor</w>
       <w>carsales</w>
       <w>clearfix</w>
+      <w>dateutil</w>
+      <w>dframe</w>
       <w>evdb</w>
       <w>evobsession</w>
       <w>featimg</w>
@@ -21,8 +23,10 @@
       <w>siteaddresses</w>
       <w>sitename</w>
       <w>sitetitles</w>
+      <w>strftime</w>
       <w>theverge</w>
       <w>thevergecars</w>
+      <w>utcfromtimestamp</w>
     </words>
   </dictionary>
 </component>

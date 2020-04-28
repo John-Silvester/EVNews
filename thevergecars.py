@@ -1,65 +1,82 @@
-from bs4 import BeautifulSoup
-import requests
+# from bs4 import BeautifulSoup
+# import requests
+# import pandas as pd
 from dateutil.parser import parse
-import pandas as pd
+from my_functions import *
 
-articles_file = 'thevergecars_articles.csv'
-headers = {
-    'User-Agent': 'Mozilla/5.0 (X11; Linux x86_64) '
-                  'AppleWebKit/537.36 (KHTML, like Gecko) Chrome/78.0.3904.70 Safari/537.36'}
-
-source = requests.get('https://www.theverge.com/cars/archives/10', headers=headers).text
-
-soup = BeautifulSoup(source, 'lxml')
-
-articles = soup.find_all("div", "c-compact-river__entry")
-# print(articles)
-
+storieslist = []
 storiesdf = []
+pagenumber = 1
+newrecord = True
+articles_file = "thevergecars_articles.csv"
+article_setup = False
+weboutlet = 'The Verge - cars'
 
-for article in articles:
-    if article.find('h2') is None:
-        continue
-    article_title = article.find('h2').text
-    article_title = article_title.encode('utf-8')
-    article_title = article_title.decode("utf-8")
 
-    article_body = article_title
+def main():
+    global newrecord, pagenumber, storiesdf, storieslist, weboutlet, articles_file, article_setup
+    df1 = pd.DataFrame(columns=['date', 'title', 'short_description', 'article_link', 'image',
+                                'byline', 'alt', 'outlet'])
+    if not article_setup:
+        df1 = pd.read_csv(articles_file, encoding='utf-8')
+        storieslist = df1["title"].head(10).tolist()
 
-    article_image_url = article.find('noscript').img
-    article_image = article_image_url.get('src')
+    while newrecord:
+        print(weboutlet, ' page ', pagenumber, '\n')
 
-    article_date = article.find('time', class_="c-byline__item")
-    article_date = article_date.get('datetime')
-    article_date = parse(article_date)
+        soup = make_soup('https://www.theverge.com/cars/archives/' + str(pagenumber) + "/")
 
-    if article.find('span', 'c-byline__author-name') is None:
-        article_byline = ""
+        articles = soup.find_all("div", "c-compact-river__entry")
+
+        for article in articles:
+            if get_element(article, 'h2', clean_str=False) == 'Empty':
+                continue
+            article_title = get_element(article, 'h2', text=True)
+            if any(article_title in x for x in storieslist):
+                newrecord = False
+                break
+
+            article_body = article_title
+
+            article_image = get_element(article, 'noscript', clean_str=False)
+            article_image = get_tag_attribute(article_image, 'img', 'src')
+
+            article_date = get_tag_attribute(article, 'time', 'datetime', tag_class='c-byline__item')
+            article_date = parse(article_date)
+
+            if get_element(article, 'span', 'c-byline__author-name') == 'Empty':
+                article_byline = "by line unknown"
+            else:
+                article_byline = get_element(article, 'span', 'c-byline__author-name', text=True)
+
+            article_link = get_element(article, 'h2', 'c-entry-box--compact__title', clean_str=False)
+            article_link = get_tag_attribute(article_link, 'a', 'href')
+
+            article_image_alt = "Image not found"
+
+            # print()
+            # print(article_date)
+            # print(article_byline)
+            # print(article_title)
+            # print(article_body)
+            # print(article_link)
+            # print(article_image)
+            # print(article_image_alt)
+            # print(weboutlet)
+
+            storiesdf.append((article_date, article_title, article_body, article_link, article_image,
+                              article_byline, article_image_alt, weboutlet))
+
+        if article_setup:
+            newrecord = False
+            break
+        pagenumber += 1
+
+    if article_setup:
+        setup_articles(storiesdf, weboutlet, articles_file)
     else:
-        article_byline = article.find('span', 'c-byline__author-name').text
-
-    article_link = article.find('h2').a
-    article_link = article_link.get('href')
-
-    weboutlet = "The Verge - cars"
-    article_image_alt = "Image not found"
-
-    storiesdf.append((article_date, article_title, article_body, article_link, article_image,
-                      article_byline, article_image_alt, weboutlet))
-
-    # print()
-    #
-    # print(article_date)
-    # print(article_title)
-    # print(article_body)
-    # print(article_link)
-    # print(article_image)
-    # print(article_byline)
-    # print(article_image_alt)
-    # print(weboutlet)
+        update_articles(df1, storiesdf, weboutlet, articles_file)
 
 
-df = pd.DataFrame(storiesdf, columns=['date', 'title', 'short_description', 'article_link', 'image',
-                                      'byline', 'alt', 'outlet'])
-
-df.to_csv(articles_file, index=False, encoding='utf-8')
+if __name__ == '__main__':
+    main()

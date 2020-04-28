@@ -61,11 +61,10 @@ while newrecord:
         storiesdf.append((article_datetime, article_title, article_body, article_link, article_image_url,
                           article_byline, article_image_alt, weboutlet))
 
-    pagenumber = pagenumber+1
-#
+    pagenumber += 1
+
 df2 = pd.DataFrame(storiesdf, columns=['date', 'title', 'short_description', 'article_link', 'image',
                                        'byline', 'alt', 'outlet'])
-
 
 
 frames = [df2, df1]

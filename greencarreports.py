@@ -1,61 +1,73 @@
-from bs4 import BeautifulSoup
-# from urllib.request import urlopen
-import requests
+# from bs4 import BeautifulSoup
+# import requests
+# import pandas as pd
 from dateutil.parser import parse
-import pandas as pd
-# from datetime import date, timedelta
+from my_functions import *
 
-articles_file = '/home/john/PycharmProjects/EVNews/greencarreports_articles.csv'
-
-source = requests.get('https://www.greencarreports.com/news/page-2').text
-
-soup = BeautifulSoup(source, 'lxml')
-
-articles = soup.find_all("li")
-# print(article)
-
+storieslist = []
 storiesdf = []
-
-for article in articles:
-    if article.find('a', 'title') is None:
-        continue
-    article_title = article.find('a', 'title').text
-    article_title = article_title.encode('utf-8')
-    article_title = article_title.decode("utf-8")
-
-    article_body = article.find('p').text
-
-    article_image_url = article.find('img')
-    article_image = article_image_url.get('data-src')
-
-    article_date = article.find('time').text
-    article_date = parse(article_date)
-
-    article_byline = article.find('a', 'by-line').text
-
-    article_link = article.find('a', 'title')
-    article_link = article_link.get('href')
-    article_link = "https://www.greencarreports.com" + article_link
-
-    weboutlet = "Green Car Reports"
-    article_image_alt = "Image not found"
-
-    storiesdf.append((article_date, article_title, article_body, article_link, article_image,
-                      article_byline, article_image_alt, weboutlet))
-
-    # print()
-    #
-    # print(article_date)
-    # print(article_title)
-    # print(article_body)
-    # print(article_link)
-    # print(article_image)
-    # print(article_byline)
-    # print(article_image_alt)
-    # print(weboutlet)
+pagenumber = 1
+newrecord = True
+articles_file = "greencarreports_articles.csv"
+article_setup = False
+weboutlet = "Green Car Reports"
 
 
-df = pd.DataFrame(storiesdf, columns=['date', 'title', 'short_description', 'article_link', 'image',
-                                      'byline', 'alt', 'outlet'])
+def main():
+    global newrecord, pagenumber, storiesdf, storieslist, weboutlet, articles_file, article_setup
+    df1 = pd.DataFrame(columns=['date', 'title', 'short_description', 'article_link', 'image',
+                                'byline', 'alt', 'outlet'])
+    if not article_setup:
+        df1 = pd.read_csv(articles_file, encoding='utf-8')
+        storieslist = df1["title"].head(10).tolist()
 
-df.to_csv(articles_file, index=False, encoding='utf-8')
+    while newrecord:
+        print(weboutlet, ' page ', pagenumber, '\n')
+
+        soup = make_soup('https://www.greencarreports.com/news/page-' + str(pagenumber))
+
+        articles = soup.find_all("li")
+
+        for article in articles:
+            if get_element(article, 'a', 'title', clean_str=False) == 'Empty':
+                continue
+            article_title = get_element(article, 'a', 'title', text=True)
+            if any(article_title in x for x in storieslist):
+                newrecord = False
+                break
+
+            article_body = get_element(article, 'p', text=True)
+
+            if get_tag_attribute(article, 'img', 'data-src') is None:
+                article_image = get_tag_attribute(article, 'img', 'src')
+            else:
+                article_image = get_tag_attribute(article, 'img', 'data-src')
+
+            article_date = parse(get_element(article, 'time', text=True))
+
+            article_byline = get_element(article, 'a', 'by-line', text=True)
+
+            article_link = get_tag_attribute(article, 'a', 'href', tag_class='title')
+            article_link = "https://www.greencarreports.com" + article_link
+
+            article_image_alt = get_tag_attribute(article, 'img', 'alt')
+
+            # print(article_title)
+            # print(article_link)
+
+            storiesdf.append((article_date, article_title, article_body, article_link, article_image,
+                              article_byline, article_image_alt, weboutlet))
+
+        if article_setup:
+            newrecord = False
+            break
+        pagenumber += 1
+
+    if article_setup:
+        setup_articles(storiesdf, weboutlet, articles_file)
+    else:
+        update_articles(df1, storiesdf, weboutlet, articles_file)
+
+
+if __name__ == '__main__':
+    main()

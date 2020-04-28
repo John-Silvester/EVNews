@@ -1,63 +1,74 @@
-from bs4 import BeautifulSoup
-import requests
+# from bs4 import BeautifulSoup
+# import requests
+# import pandas as pd
 from dateutil.parser import parse
-import pandas as pd
+from my_functions import *
 
-articles_file = 'evobsession_articles.csv'
-
-headers = {
-    'User-Agent': 'Mozilla/5.0 (X11; Linux x86_64) '
-                  'AppleWebKit/537.36 (KHTML, like Gecko) Chrome/78.0.3904.70 Safari/537.36'}
-
-source = requests.get('https://evobsession.com/category/electric-vehicles/100-electric-vehicles/page/2/',
-                      headers=headers).text
-
-soup = BeautifulSoup(source, 'lxml')
-
-articles = soup.find_all("article", "item")
-# print(articles)
-
+storieslist = []
 storiesdf = []
+pagenumber = 1
+newrecord = True
+articles_file = "evobsession_articles.csv"
+article_setup = False
+weboutlet = 'EV Obsession'
 
-for article in articles:
-    if article.find('h2', "grid-title") is None:
-        continue
-    article_title = article.find('h2', "grid-title").text
-    article_title = article_title.encode('utf-8')
-    article_title = article_title.decode("utf-8")
 
-    article_body = article_title
+def main():
+    global newrecord, pagenumber, storiesdf, storieslist, weboutlet, articles_file, article_setup
+    df1 = pd.DataFrame(columns=['date', 'title', 'short_description', 'article_link', 'image',
+                                'byline', 'alt', 'outlet'])
+    if not article_setup:
+        df1 = pd.read_csv(articles_file, encoding='utf-8')
+        storieslist = df1["title"].head(10).tolist()
 
-    article_image_url = article.find('a', 'penci-image-holder')
-    article_image = article_image_url.get('data-src')
-    article_image, *args = article_image.split('?', 1)
+    while newrecord:
+        print(weboutlet, ' page ', pagenumber, '\n')
 
-    article_date = article.find('div', 'grid-post-box-meta').text
-    article_date = article_date.strip()
-    article_byline, article_date = article_date.split('\n')
-    article_date = parse(article_date)
+        soup = make_soup('https://evobsession.com/category/electric-vehicles/100-electric-vehicles/page/'
+                         + str(pagenumber) + "/")
 
-    article_link = article.find('a', 'penci-image-holder')
-    article_link = article_link.get('href')
-    weboutlet = "EV Obsession"
-    article_image_alt = "Image not found"
+        articles = soup.find_all("article", "item")
 
-    storiesdf.append((article_date, article_title, article_body, article_link, article_image,
-                      article_byline, article_image_alt, weboutlet))
+        for article in articles:
+            if get_element(article, 'h2', "grid-title") is None:
+                continue
+            article_title = get_element(article, 'h2', "grid-title", text=True)
+            if any(article_title in x for x in storieslist):
+                newrecord = False
+                break
 
-    print()
+            article_body = article_title
 
-    print(article_date)
-    print(article_title)
-    print(article_body)
-    print(article_link)
-    print(article_image)
-    print(article_byline)
-    print(article_image_alt)
-    print(weboutlet)
+            article_image = get_tag_attribute(article, 'a', 'data-src', tag_class='penci-image-holder')
+            article_image, *args = article_image.split('?', 1)
 
-df = pd.DataFrame(storiesdf, columns=['date', 'title', 'short_description', 'article_link', 'image',
-                                      'byline', 'alt', 'outlet'])
-# df['date'] = pd.to_datetime(df['date'])
+            article_date = get_element(article, 'div', 'grid-post-box-meta', text=True, clean_str=False)
+            article_date = article_date.strip()
+            article_byline, article_date = article_date.split('\n')
+            article_date = parse(article_date)
 
-df.to_csv(articles_file, index=False, encoding='utf-8')
+            article_byline = make_utf8(article_byline)
+
+            article_link = get_tag_attribute(article, 'a', 'href', tag_class='penci-image-holder')
+
+            article_image_alt = "Image not found"
+
+            # print(article_title)
+            # print(article_link)
+
+            storiesdf.append((article_date, article_title, article_body, article_link, article_image,
+                              article_byline, article_image_alt, weboutlet))
+
+        if article_setup:
+            newrecord = False
+            break
+        pagenumber += 1
+
+    if article_setup:
+        setup_articles(storiesdf, weboutlet, articles_file)
+    else:
+        update_articles(df1, storiesdf, weboutlet, articles_file)
+
+
+if __name__ == '__main__':
+    main()
