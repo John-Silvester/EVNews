@@ -62,7 +62,7 @@ def get_tag_attribute(html_code, tag_type, attribute, tag_class=''):
     return new_string
 
 
-def update_articles(dframe1, dframe2, weboutlet, articles_file):
+def update_articles(dframe1, dframe2, weboutlet, articles_file, article_count):
     # global articles_file
     new_df = pd.DataFrame(dframe2, columns=['date', 'title', 'short_description', 'article_link', 'image',
                                             'byline', 'alt', 'outlet'])
@@ -70,14 +70,14 @@ def update_articles(dframe1, dframe2, weboutlet, articles_file):
     frames = [new_df, dframe1]
     df_final = pd.concat(frames, sort=False)
     df_final.to_csv(articles_file, index=False, encoding='utf-8')
-    print('\n', weboutlet, ' completed')
+    print(f'{weboutlet} completed with {article_count} articles')
     return True
 
 
-def setup_articles(dframe2, weboutlet, articles_file):
+def setup_articles(dframe2, weboutlet, articles_file, article_count):
     # global articles_file
     new_df = pd.DataFrame(dframe2, columns=['date', 'title', 'short_description', 'article_link', 'image',
                                             'byline', 'alt', 'outlet'])
     new_df.to_csv(articles_file, index=False, encoding='utf-8')
-    print('\n', weboutlet, ' completed')
+    print(f'\n {weboutlet} completed with {article_count} articles')
     return True

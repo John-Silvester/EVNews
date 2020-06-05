@@ -15,6 +15,7 @@ weboutlet = 'CleanTechnica'
 
 def main():
     global newrecord, pagenumber, storiesdf, storieslist, weboutlet, articles_file, article_setup
+    article_counter = 0
     df1 = pd.DataFrame(columns=['date', 'title', 'short_description', 'article_link', 'image',
                                 'byline', 'alt', 'outlet'])
     if not article_setup:
@@ -36,7 +37,8 @@ def main():
                 newrecord = False
                 break
 
-            article_title = make_utf8(article_title)
+            article_link = get_element(article, 'div', 'omc-blog-two-text', clean_str=False)
+            article_link = get_tag_attribute(article_link, 'a', 'href')
 
             article_body = get_element(article, 'p', "omc-blog-two-exceprt", text=True)
 
@@ -49,9 +51,6 @@ def main():
 
             article_byline = article_byline.strip()
 
-            article_link = get_element(article, 'div', 'omc-blog-two-text', clean_str=False)
-            article_link = get_tag_attribute(article_link, 'a', 'href')
-
             article_image_alt = "Image not found"
 
             # print(article_title)
@@ -59,6 +58,7 @@ def main():
 
             storiesdf.append((article_date, article_title, article_body, article_link, article_image,
                               article_byline, article_image_alt, weboutlet))
+            article_counter += 1
 
         if article_setup:
             newrecord = False
@@ -66,9 +66,9 @@ def main():
         pagenumber += 1
 
     if article_setup:
-        setup_articles(storiesdf, weboutlet, articles_file)
+        setup_articles(storiesdf, weboutlet, articles_file, article_counter)
     else:
-        update_articles(df1, storiesdf, weboutlet, articles_file)
+        update_articles(df1, storiesdf, weboutlet, articles_file, article_counter)
 
 
 if __name__ == '__main__':

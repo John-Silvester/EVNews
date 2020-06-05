@@ -15,6 +15,7 @@ weboutlet = 'greencarguide'
 
 def main():
     global newrecord, pagenumber, storiesdf, storieslist, weboutlet, articles_file, article_setup
+    article_counter = 0
     df1 = pd.DataFrame(columns=['date', 'title', 'short_description', 'article_link', 'image',
                                 'byline', 'alt', 'outlet'])
     if not article_setup:
@@ -36,6 +37,8 @@ def main():
                 newrecord = False
                 break
 
+            article_link = get_tag_attribute(article, 'a', 'href')
+
             article_body = get_element(article, 'span', "description", clean_str=False)
             article_body = get_element(article_body, 'p', text=True)
 
@@ -46,9 +49,7 @@ def main():
             article_date = get_element(article, 'span', "post-date", text=True)
             article_date = parse(article_date)
 
-            article_byline = "by line: unknown"
-
-            article_link = get_tag_attribute(article, 'a', 'href')
+            article_byline = "by line: not supplied"
 
             article_image_alt = "Image not found"
 
@@ -57,6 +58,7 @@ def main():
 
             storiesdf.append((article_date, article_title, article_body, article_link, article_image,
                               article_byline, article_image_alt, weboutlet))
+            article_counter += 1
 
         if article_setup:
             newrecord = False
@@ -64,9 +66,9 @@ def main():
         pagenumber += 1
 
     if article_setup:
-        setup_articles(storiesdf, weboutlet, articles_file)
+        setup_articles(storiesdf, weboutlet, articles_file, article_counter)
     else:
-        update_articles(df1, storiesdf, weboutlet, articles_file)
+        update_articles(df1, storiesdf, weboutlet, articles_file, article_counter)
 
 
 if __name__ == '__main__':

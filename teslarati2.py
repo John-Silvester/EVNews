@@ -13,6 +13,7 @@ storieslist = df1["title"].head(5).tolist()
 
 while newrecord:
     print('Teslarati pass ', pagenumber)
+
     source = requests.get('https://www.teslarati.com/category/news/page/' + str(pagenumber) + "/").text
 
     soup = BeautifulSoup(source, 'lxml')

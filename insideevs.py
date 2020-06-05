@@ -17,6 +17,7 @@ weboutlet = 'Inside EVs'
 
 def main():
     global newrecord, pagenumber, storiesdf, storieslist, weboutlet, articles_file, article_setup
+    article_counter = 0
     df1 = pd.DataFrame(columns=['date', 'title', 'short_description', 'article_link', 'image',
                                 'byline', 'alt', 'outlet'])
     if not article_setup:
@@ -24,7 +25,8 @@ def main():
         storieslist = df1["title"].head(10).tolist()
 
     while newrecord:
-        print('Inside EVs pass ', pagenumber)
+        print(weboutlet, ' page ', pagenumber, '\n')
+
         url = 'https://insideevs.com'
 
         soup = make_soup("https://insideevs.com/news/?p=" + str(pagenumber))
@@ -44,8 +46,6 @@ def main():
                 article_link = url+article_link
 
             article_date = get_tag_attribute(article, 'span', 'data-time', tag_class='date')
-            if article_date == 'not_found':
-                continue
 
             ts = int(article_date)
             article_date = datetime.datetime.utcfromtimestamp(ts).strftime('%Y-%m-%d %H:%M:%S')
@@ -58,6 +58,9 @@ def main():
 
             article_image_alt = get_tag_attribute(article, 'img', 'alt')
 
+            if article_date == 'not_found':
+                pass
+
             # print()
             # print(article_title)
             # print(article_date)
@@ -65,6 +68,7 @@ def main():
 
             storiesdf.append((article_date, article_title, article_body, article_link, article_image,
                               article_byline, article_image_alt, weboutlet))
+            article_counter += 1
 
         if article_setup:
             newrecord = False
@@ -72,9 +76,9 @@ def main():
         pagenumber += 1
 
     if article_setup:
-        setup_articles(storiesdf, weboutlet, articles_file)
+        setup_articles(storiesdf, weboutlet, articles_file, article_counter)
     else:
-        update_articles(df1, storiesdf, weboutlet, articles_file)
+        update_articles(df1, storiesdf, weboutlet, articles_file, article_counter)
 
 
 if __name__ == '__main__':

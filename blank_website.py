@@ -13,88 +13,9 @@ article_setup = False
 weboutlet = 'CleanTechnica'
 
 
-# def make_soup(web_address):
-#     global pagenumber
-#     headers = {
-#         'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) '
-#                       'AppleWebKit/537.36 (KHTML, like Gecko) Chrome/79.0.3945.117 Safari/537.36'}
-#     req_source = requests.get(web_address, headers=headers).text
-#     beautiful_output = BeautifulSoup(req_source, 'lxml')
-#     return beautiful_output
-#
-#
-# def make_utf8(string_in):
-#     string_in = string_in.encode('utf-8')
-#     string_out = string_in.decode("utf-8")
-#     return string_out
-#
-#
-# def get_element(html_code, tag_type, tag_class='', text=False, clean_str=True):
-#     new_string = ''
-#     if tag_class == '' and text is False:
-#         new_string = html_code.find(tag_type)
-#     if tag_class != '' and text is False:
-#         new_string = html_code.find(tag_type, tag_class)
-#     if new_string is None:
-#         new_string = 'Empty'
-#         return new_string
-#
-#     if tag_class == '' and text is True:
-#         if html_code.find(tag_type) is None:
-#             new_string = 'Empty'
-#             return new_string
-#         new_string = html_code.find(tag_type).text
-#     if tag_class != '' and text is True:
-#         if html_code.find(tag_type, tag_class) is None:
-#             new_string = 'Empty'
-#             return new_string
-#         new_string = html_code.find(tag_type, tag_class).text
-#     if not clean_str:
-#         return new_string
-#
-#     new_string = str(new_string)
-#     new_string = new_string.replace('\n', '')
-#     new_string = new_string.replace('\r', '')
-#     new_string = make_utf8(new_string)
-#     return new_string
-#
-#
-# def get_tag_attribute(html_code, tag_type, attribute, tag_class=''):
-#     if tag_class == '':
-#         new_string = html_code.find(tag_type).get(attribute)
-#     else:
-#         new_string = html_code.find(tag_type, tag_class).get(attribute)
-#     if new_string is None:
-#         new_string = 'not_found'
-#         return new_string
-#
-#     new_string = str(make_utf8(new_string))
-#     return new_string
-#
-#
-# def update_articles(dframe1, dframe2):
-#     global articles_file
-#     new_df = pd.DataFrame(dframe2, columns=['date', 'title', 'short_description', 'article_link', 'image',
-#                                             'byline', 'alt', 'outlet'])
-#
-#     frames = [new_df, dframe1]
-#     df_final = pd.concat(frames, sort=False)
-#     df_final.to_csv(articles_file, index=False, encoding='utf-8')
-#     print(weboutlet, ' completed')
-#     return True
-#
-#
-# def setup_articles(dframe2):
-#     global articles_file
-#     new_df = pd.DataFrame(dframe2, columns=['date', 'title', 'short_description', 'article_link', 'image',
-#                                             'byline', 'alt', 'outlet'])
-#     new_df.to_csv(articles_file, index=False, encoding='utf-8')
-#     print(weboutlet, ' completed')
-#     return True
-
-
 def main():
     global newrecord, pagenumber, storiesdf, storieslist, weboutlet, articles_file, article_setup
+    article_counter = 0
     df1 = pd.DataFrame(columns=['date', 'title', 'short_description', 'article_link', 'image',
                                 'byline', 'alt', 'outlet'])
     if not article_setup:
@@ -132,11 +53,12 @@ def main():
 
             article_image_alt = "Image not found"
 
-            print(article_title)
-            print(article_link)
+            # print(article_title)
+            # print(article_link)
 
             storiesdf.append((article_date, article_title, article_body, article_link, article_image,
                               article_byline, article_image_alt, weboutlet))
+            article_counter += 1
 
         if article_setup:
             newrecord = False
@@ -144,9 +66,9 @@ def main():
         pagenumber += 1
 
     if article_setup:
-        setup_articles(storiesdf, weboutlet, articles_file)
+        setup_articles(storiesdf, weboutlet, articles_file, article_counter)
     else:
-        update_articles(df1, storiesdf, weboutlet, articles_file)
+        update_articles(df1, storiesdf, weboutlet, articles_file, article_counter)
 
 
 if __name__ == '__main__':

@@ -1,7 +1,7 @@
 # from bs4 import BeautifulSoup
-# import requests
+import requests
 # import pandas as pd
-from datetime import date, timedelta
+from dateutil.parser import parse
 from my_functions import *
 
 storieslist = []
@@ -15,6 +15,7 @@ weboutlet = "Teslarati"
 
 def main():
     global newrecord, pagenumber, storiesdf, storieslist, weboutlet, articles_file, article_setup
+    article_counter = 0
     df1 = pd.DataFrame(columns=['date', 'title', 'short_description', 'article_link', 'image',
                                 'byline', 'alt', 'outlet'])
     if not article_setup:
@@ -22,7 +23,8 @@ def main():
         storieslist = df1["title"].head(10).tolist()
 
     while newrecord:
-        print('Teslarati pass ', pagenumber)
+        print(weboutlet, ' page ', pagenumber, '\n')
+
         soup = make_soup('https://www.teslarati.com/category/news/page/' + str(pagenumber) + "/")
 
         articles = soup.find_all('li', class_='infinite-post')
@@ -35,26 +37,31 @@ def main():
                 newrecord = False
                 break
 
+            article_link = get_tag_attribute(article, 'a', 'href')
+
             article_body = article.find('p').text
 
             article_image = get_tag_attribute(article, 'img', 'src')
-            article_image = article_image.replace('450x270', '1000x600')
-
-            article_link = get_tag_attribute(article, 'a', 'href')
+            article_image_hi_res = article_image.replace('450x270', '1000x600')
+            image_request = requests.get(article_image_hi_res)
+            article_image = article_image_hi_res if image_request.status_code == 200 else article_image
 
             article_image_alt = "Image not found"
 
-            article_date = date.today() - timedelta(1)
+            temp_soup = make_soup(article_link)
 
-            article_byline = ""
+            article_date = parse(get_element(temp_soup, "time", text=True))
+
+            article_byline = get_element(temp_soup, "span", "author-name vcard fn author", text=True)
 
             # print()
-            # print(article_title)
+            # print(article_byline)
             # print(article_date)
             # print(article_link)
 
             storiesdf.append((article_date, article_title, article_body, article_link, article_image,
                               article_byline, article_image_alt, weboutlet))
+            article_counter += 1
 
         if article_setup:
             newrecord = False
@@ -62,9 +69,9 @@ def main():
         pagenumber += 1
 
     if article_setup:
-        setup_articles(storiesdf, weboutlet, articles_file)
+        setup_articles(storiesdf, weboutlet, articles_file, article_counter)
     else:
-        update_articles(df1, storiesdf, weboutlet, articles_file)
+        update_articles(df1, storiesdf, weboutlet, articles_file, article_counter)
 
 
 if __name__ == '__main__':
