@@ -8,9 +8,9 @@ storieslist = []
 storiesdf = []
 pagenumber = 1
 newrecord = True
-articles_file = "electrive_articles.csv"
+articles_file = "thedriven_articles.csv"
 article_setup = False
-weboutlet = 'electrive'
+weboutlet = 'The Driven'
 
 
 def main():
@@ -24,39 +24,45 @@ def main():
 
     while newrecord:
         print(weboutlet, ' page ', pagenumber, '\n')
-        if pagenumber == 1:
-            soup = make_soup('https://www.electrive.com/category/automobile/')
-        else:
-            soup = make_soup('https://www.electrive.com/category/automobile/page/' + str(pagenumber) + "/")
 
-        articles = soup.find_all("article", "teaser row")
+        soup = make_soup('https://thedriven.io/category/ev-news/page/' + str(pagenumber) + "/")
+
+        articles = soup.find_all("article")
 
         for article in articles:
-            if get_element(article, 'h3', clean_str=False) is None:
+            if get_element(article, 'h2', "entry-title", clean_str=False) == 'Empty':
                 continue
-            article_title = get_element(article, 'h3', text=True)
+            article_title = get_element(article, 'h2', "entry-title", text=True)
             if any(article_title in x for x in storieslist):
                 newrecord = False
                 break
 
-            article_link = get_tag_attribute(article, 'a', 'href')
+            article_body = get_element(article, 'div', "post-excerpt", text=True)
 
-            article_body = get_element(article, 'p', text=True)
+            image_element = get_element(article, 'div', "post-thumbnail", clean_str=False)
+            if image_element == "Empty":
+                image_element = get_element(article, 'section', "post-media", clean_str=False)
+            article_image = get_tag_attribute(image_element, 'img', 'data-src')
+            article_image = article_image.replace("-560x420", "")
 
-            article_image = get_tag_attribute(article, 'img', 'src')
-            article_image = article_image.replace('-300x150', '')
+            article_date = get_element(article, 'li', "meta-date", text=True)
+            article_date = parse(article_date.strip())
 
-            article_date = parse(get_element(article, 'span', "meta", text=True))
+            article_byline = get_element(article, 'li', "meta-author", text=True).strip()
 
-            temp_soup = make_soup(article_link)
-            article_byline = get_element(temp_soup, "span", "author", text=True)
+            article_link = get_element(article, 'h2', 'entry-title', clean_str=False)
+            article_link = get_tag_attribute(article_link, 'a', 'href')
 
-            article_image_alt = "Image not found"
+            article_image_alt = get_tag_attribute(image_element, 'img', 'alt')
 
-            # print()
             # print(article_title)
-            # print(article_byline)
             # print(article_body)
+            # print(article_image)
+            # print(article_date)
+            # print(article_byline)
+            # print(article_link)
+            # print(article_image_alt)
+            # print()
 
             storiesdf.append((article_date, article_title, article_body, article_link, article_image,
                               article_byline, article_image_alt, weboutlet))

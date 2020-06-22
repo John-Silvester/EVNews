@@ -1,5 +1,5 @@
 # from bs4 import BeautifulSoup
-import requests
+# import requests
 # import pandas as pd
 from dateutil.parser import parse
 from my_functions import *
